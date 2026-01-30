@@ -1,7 +1,7 @@
 -- QuestProgressSound/Config.lua
 
 local _, QPS = ...
-local L = QPS.L
+local L = LibStub("AceLocale-3.0"):GetLocale("QuestProgressSound")
 
 local AceDBOptions = LibStub and LibStub("AceDBOptions-3.0", true)
 
@@ -118,47 +118,38 @@ function QPS:CreateOptionsPanel()
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
     subtitle:SetText(L["Config Subtitle"])
     
-    -- Scroll Frame für bessere Übersicht
-    local scrollFrame = CreateFrame("ScrollFrame", nil, panel, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -20)
-    scrollFrame:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 10)
-    
-    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
-    scrollChild:SetSize(scrollFrame:GetWidth(), 1)
-    scrollFrame:SetScrollChild(scrollChild)
-    
-    local yOffset = -10
+    local yOffset = -60
     
     -- ==============================================
     -- BEREICH: EIGENE QUESTS
     -- ==============================================
     
-    local selfHeader = scrollChild:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    selfHeader:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
+    local selfHeader = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    selfHeader:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset)
     selfHeader:SetText(L["Own Quests"])
     selfHeader:SetTextColor(0.4, 0.78, 1.0)
     yOffset = yOffset - 30
     
     -- Trennlinie
-    local selfSeparator = scrollChild:CreateTexture(nil, "ARTWORK")
+    local selfSeparator = panel:CreateTexture(nil, "ARTWORK")
     selfSeparator:SetHeight(1)
-    selfSeparator:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-    selfSeparator:SetPoint("TOPRIGHT", scrollChild, "TOPRIGHT", -10, yOffset)
+    selfSeparator:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset)
+    selfSeparator:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -16, yOffset)
     selfSeparator:SetColorTexture(0.3, 0.3, 0.3, 0.8)
     yOffset = yOffset - 15
     
     -- Eigener Fortschritt
-    local selfProgressLabel = scrollChild:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    selfProgressLabel:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 20, yOffset)
+    local selfProgressLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    selfProgressLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
     selfProgressLabel:SetText(L["Quest Progress"])
     selfProgressLabel:SetTextColor(1, 0.82, 0)
     yOffset = yOffset - 25
     
     self.ui.selfProgressCheck = CreateCheckButton(
-        scrollChild,
+        panel,
         L["Sound Play"],
         L["Quest Progress Enable"],
-        30,
+        36,
         yOffset,
         function() return QPS.db.profile.enableSelfProgressSound end,
         function(value) QPS.db.profile.enableSelfProgressSound = value end
@@ -166,9 +157,9 @@ function QPS:CreateOptionsPanel()
     yOffset = yOffset - 30
 
     self.ui.selfProgressDrop = CreateSoundDropDown(
-        scrollChild,
+        panel,
         L["Sound Select"],
-        40,
+        46,
         yOffset,
         function() return QPS.db.profile.sounds.selfProgress end,
         function(value) QPS.db.profile.sounds.selfProgress = value end
@@ -176,17 +167,17 @@ function QPS:CreateOptionsPanel()
     yOffset = yOffset - 55
     
     -- Eigener Abschluss
-    local selfCompleteLabel = scrollChild:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    selfCompleteLabel:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 20, yOffset)
+    local selfCompleteLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    selfCompleteLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
     selfCompleteLabel:SetText(L["Quest Completion"])
     selfCompleteLabel:SetTextColor(1, 0.82, 0)
     yOffset = yOffset - 25
     
     self.ui.selfCompleteCheck = CreateCheckButton(
-        scrollChild,
+        panel,
         L["Sound Play"],
         L["Quest Completion Enable"],
-        30,
+        36,
         yOffset,
         function() return QPS.db.profile.enableSelfCompleteSound end,
         function(value) QPS.db.profile.enableSelfCompleteSound = value end
@@ -194,9 +185,9 @@ function QPS:CreateOptionsPanel()
     yOffset = yOffset - 30
 
     self.ui.selfCompleteDrop = CreateSoundDropDown(
-        scrollChild,
+        panel,
         L["Sound Select"],
-        40,
+        46,
         yOffset,
         function() return QPS.db.profile.sounds.selfComplete end,
         function(value) QPS.db.profile.sounds.selfComplete = value end
@@ -207,32 +198,32 @@ function QPS:CreateOptionsPanel()
     -- BEREICH: GRUPPENQUESTS
     -- ==============================================
     
-    local groupHeader = scrollChild:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    groupHeader:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
+    local groupHeader = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    groupHeader:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset)
     groupHeader:SetText(L["Group Quests"])
     groupHeader:SetTextColor(0.4, 0.78, 1.0)
     yOffset = yOffset - 30
     
     -- Trennlinie
-    local groupSeparator = scrollChild:CreateTexture(nil, "ARTWORK")
+    local groupSeparator = panel:CreateTexture(nil, "ARTWORK")
     groupSeparator:SetHeight(1)
-    groupSeparator:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-    groupSeparator:SetPoint("TOPRIGHT", scrollChild, "TOPRIGHT", -10, yOffset)
+    groupSeparator:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset)
+    groupSeparator:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -16, yOffset)
     groupSeparator:SetColorTexture(0.3, 0.3, 0.3, 0.8)
     yOffset = yOffset - 15
     
     -- Gruppenfortschritt
-    local groupProgressLabel = scrollChild:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    groupProgressLabel:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 20, yOffset)
+    local groupProgressLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    groupProgressLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
     groupProgressLabel:SetText(L["Quest Progress"])
     groupProgressLabel:SetTextColor(1, 0.82, 0)
     yOffset = yOffset - 25
     
     self.ui.groupProgressCheck = CreateCheckButton(
-        scrollChild,
+        panel,
         L["Sound Play"],
         L["Group Progress Enable"],
-        30,
+        36,
         yOffset,
         function() return QPS.db.profile.enableGroupProgressSound end,
         function(value) QPS.db.profile.enableGroupProgressSound = value end
@@ -240,9 +231,9 @@ function QPS:CreateOptionsPanel()
     yOffset = yOffset - 30
 
     self.ui.groupProgressDrop = CreateSoundDropDown(
-        scrollChild,
+        panel,
         L["Sound Select"],
-        40,
+        46,
         yOffset,
         function() return QPS.db.profile.sounds.groupProgress end,
         function(value) QPS.db.profile.sounds.groupProgress = value end
@@ -250,17 +241,17 @@ function QPS:CreateOptionsPanel()
     yOffset = yOffset - 55
     
     -- Gruppenabschluss
-    local groupCompleteLabel = scrollChild:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    groupCompleteLabel:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 20, yOffset)
+    local groupCompleteLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    groupCompleteLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
     groupCompleteLabel:SetText(L["Quest Completion"])
     groupCompleteLabel:SetTextColor(1, 0.82, 0)
     yOffset = yOffset - 25
     
     self.ui.groupCompleteCheck = CreateCheckButton(
-        scrollChild,
+        panel,
         L["Sound Play"],
         L["Group Completion Enable"],
-        30,
+        36,
         yOffset,
         function() return QPS.db.profile.enableGroupCompleteSound end,
         function(value) QPS.db.profile.enableGroupCompleteSound = value end
@@ -268,17 +259,13 @@ function QPS:CreateOptionsPanel()
     yOffset = yOffset - 30
 
     self.ui.groupCompleteDrop = CreateSoundDropDown(
-        scrollChild,
+        panel,
         L["Sound Select"],
-        40,
+        46,
         yOffset,
         function() return QPS.db.profile.sounds.groupComplete end,
         function(value) QPS.db.profile.sounds.groupComplete = value end
     )
-    yOffset = yOffset - 55
-    
-    -- Scroll Child Höhe anpassen
-    scrollChild:SetHeight(math.abs(yOffset) + 50)
 
     panel.refresh = function()
         if not QPS.db then return end
@@ -299,14 +286,44 @@ function QPS:CreateOptionsPanel()
     -- Beim Öffnen der Einstellungen nochmal syncen
     panel:SetScript("OnShow", panel.refresh)
 
-    -- Registrierung im modernen Settings-Framework
-    if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
-        local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
-        category.ID = panel.name
-        Settings.RegisterAddOnCategory(category)
-    end
-
     self.optionsPanel = panel
+    
+    -- Registrierung im Settings-Framework
+    local registered = false
+    local mainCategory = nil
+    
+    -- Versuche moderne API (11.0+)
+    if Settings and Settings.RegisterCanvasLayoutCategory then
+        local success, result = pcall(function()
+            local category, layout = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
+            if Settings.RegisterAddOnCategory then
+                Settings.RegisterAddOnCategory(category)
+            end
+            return category
+        end)
+        
+        if success and result then
+            registered = true
+            mainCategory = result
+            self.mainCategory = result
+            QPS:Print("Panel registered via modern Settings API")
+        else
+            QPS:Print("Modern API failed: " .. tostring(result))
+        end
+    end
+    
+    -- Fallback auf alte API (Classic/pre-11.0)
+    if not registered then
+        if InterfaceOptions_AddCategory then
+            InterfaceOptions_AddCategory(panel)
+            registered = true
+            QPS:Print("Panel registered via legacy InterfaceOptions API")
+        end
+    end
+    
+    if not registered then
+        QPS:Print("WARNING: Could not register options panel!")
+    end
     
     -- Add Profile Management Panel
     self:CreateProfilePanel()
@@ -532,14 +549,36 @@ function QPS:CreateProfilePanel()
     profilePanel:SetScript("OnShow", profilePanel.refresh)
     profilePanel:refresh()
     
+    self.profilePanel = profilePanel
+    
     -- Register subcategory
-    if Settings and Settings.RegisterCanvasLayoutSubcategory then
-        local category = Settings.GetCategory("QuestProgressSound")
-        if category then
-            local subcategory = Settings.RegisterCanvasLayoutSubcategory(category, profilePanel, profilePanel.name)
-            subcategory.ID = "QuestProgressSound_" .. profilePanel.name
+    local subRegistered = false
+    
+    -- Versuche moderne API (11.0+)
+    if Settings and Settings.RegisterCanvasLayoutSubcategory and self.mainCategory then
+        local success, result = pcall(function()
+            local subcategory, layout = Settings.RegisterCanvasLayoutSubcategory(self.mainCategory, profilePanel, profilePanel.name)
+            return subcategory
+        end)
+        
+        if success and result then
+            subRegistered = true
+            QPS:Print("Profile panel registered as subcategory")
+        else
+            QPS:Print("Subcategory registration failed: " .. tostring(result))
         end
     end
     
-    self.profilePanel = profilePanel
+    -- Fallback auf alte API
+    if not subRegistered then
+        if InterfaceOptions_AddCategory then
+            InterfaceOptions_AddCategory(profilePanel)
+            subRegistered = true
+            QPS:Print("Profile panel registered via legacy API")
+        end
+    end
+    
+    if not subRegistered then
+        QPS:Print("WARNING: Could not register profile panel!")
+    end
 end
