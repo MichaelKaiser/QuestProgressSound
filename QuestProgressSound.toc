@@ -1,0 +1,22 @@
+## Interface: 120000, 120001
+## Title: QuestProgressSound
+## Notes: Plays sounds and chat messages on quest progress and completion (including group progress)
+## Author: TomEpish
+## Version: 0.1.0
+## SavedVariables: QuestProgressSoundDB
+## OptionalDeps: LibSharedMedia-3.0
+
+Libs\LibStub\LibStub.lua
+Libs\AceDB-3.0\AceDB-3.0.lua
+Libs\AceDBOptions-3.0\AceDBOptions-3.0.lua
+Libs\AceLocale-3.0\AceLocale-3.0.lua
+Libs\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
+
+Locales\enUS.lua
+Locales\deDE.lua
+
+Core.lua
+Events.lua
+Chat.lua
+Comm.lua
+Config.lua
