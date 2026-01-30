@@ -4,16 +4,12 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
 
 permissions:
   contents: write
 
 jobs:
-  # 1) Bei Push auf main automatisch einen neuen Tag erzeugen
-  tag:
-    if: startsWith(github.ref, 'refs/heads/')
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -51,17 +47,6 @@ jobs:
         run: |
           git tag "${{ steps.vers.outputs.next_tag }}" "${{ github.sha }}"
           git push origin "${{ steps.vers.outputs.next_tag }}"
-
-  # 2) Bei Tag-Push das Addon bauen & zu CurseForge hochladen
-  package:
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Run BigWigs packager
         uses: BigWigsMods/packager@v2
