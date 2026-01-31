@@ -1,17 +1,19 @@
 # QuestProgressSound
 
-A World of Warcraft addon that plays customizable sounds when you or your group members make progress on quests or complete them.
+A World of Warcraft addon that plays customizable sounds and displays chat notifications when you or your group members make progress on quests or complete them.
 
 ## Features
 
-- **Own Quest Progress**: Sound notification when you make progress on your quests
-- **Own Quest Completion**: Sound notification when you complete a quest
-- **Group Quest Progress**: Sound notification when party/raid members make progress
-- **Group Quest Completion**: Sound notification when party/raid members complete quests
+- **Own Quest Progress**: Sound and chat notification when you make progress on your quests
+- **Own Quest Completion**: Sound and chat notification when you complete a quest
+- **Group Quest Progress**: Sound and chat notification when party members make progress
+- **Group Quest Completion**: Sound and chat notification when party members complete quests
+- **Chat Notifications**: Independently configurable chat messages for all event types
+- **Group Communication Control**: Choose to share quest progress only in groups (not raids)
 - **Profile Management**: Full profile support with create, switch, copy, delete, and reset functionality
-- **Customizable Sounds**: Choose from built-in sounds or any sound from LibSharedMedia-3.0
+- **Customizable Sounds**: Choose from built-in sounds, any sound from LibSharedMedia-3.0, or "None" to disable
 - **Internationalization**: Supports English (enUS) and German (deDE)
-- **Group Communication**: Automatically shares quest progress with party/raid members
+- **Compact UI**: Streamlined configuration panel with horizontal layout
 
 ## Installation
 
@@ -29,14 +31,13 @@ Access the settings via:
 ### Options
 
 **Own Quests Section:**
-- Enable/disable progress sounds
-- Enable/disable completion sounds
-- Customize sounds for progress and completion
+- **Quest Progress**: Select sound (or "None") and enable/disable chat notification
+- **Quest Completion**: Select sound (or "None") and enable/disable chat notification
 
 **Group Quests Section:**
-- Enable/disable group progress sounds
-- Enable/disable group completion sounds
-- Customize sounds for group events
+- **Only in Group**: Enable to send/receive quest updates only in party groups (not raids)
+- **Quest Progress**: Select sound (or "None") and enable/disable chat notification for group members
+- **Quest Completion**: Select sound (or "None") and enable/disable chat notification for group members
 
 **Profile Management:**
 - Create new profiles
@@ -44,6 +45,13 @@ Access the settings via:
 - Copy settings from other profiles
 - Delete unused profiles
 - Reset profiles to defaults
+
+### Sound Configuration
+
+- Select sounds from the dropdown menu (includes all LibSharedMedia-3.0 sounds)
+- Choose **"None"** to disable sound for any event type
+- Sounds can be independently configured for each event type
+- Preview sounds by selecting them from the dropdown
 
 ## Commands
 
