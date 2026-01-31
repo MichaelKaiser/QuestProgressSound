@@ -2,14 +2,14 @@
 
 local _, QPS = ...
 
-QPS.commPrefix = "QPS"
+local commPrefix = "QPS"
 
 -- -------------------------------------------------------
 -- Initialisierung
 -- -------------------------------------------------------
 
 function QPS:InitComm()
-    C_ChatInfo.RegisterAddonMessagePrefix(self.commPrefix)
+    C_ChatInfo.RegisterAddonMessagePrefix(commPrefix)
 end
 
 -- -------------------------------------------------------
@@ -61,7 +61,7 @@ function QPS:SendCommMessage(msg)
         channel = "PARTY"
     end
 
-    C_ChatInfo.SendAddonMessage(self.commPrefix, msg, channel)
+    C_ChatInfo.SendAddonMessage(commPrefix, msg, channel)
 end
 
 -- -------------------------------------------------------
@@ -69,7 +69,7 @@ end
 -- -------------------------------------------------------
 
 function QPS:HandleComm(prefix, msg, channel, sender)
-    if prefix ~= self.commPrefix then return end
+    if prefix ~= commPrefix then return end
 
     local playerName = UnitName("player")
     local shortSender = Ambiguate(sender, "short")
