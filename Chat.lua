@@ -9,6 +9,15 @@ function QPS:Print(msg)
     DEFAULT_CHAT_FRAME:AddMessage(PREFIX .. msg)
 end
 
+local function isNotificationEnabled(kind)
+    if not QPS.db or not QPS.db.profile or not QPS.db.profile.notifications then return false end
+
+    local value = QPS.db.profile.notifications[kind]
+    if value == false then return false end
+
+    return true
+end
+
 local function GetQuestTitle(questID)
     local title = C_QuestLog.GetTitleForQuestID(questID)
     if not title and QuestUtils_GetQuestName then
@@ -18,6 +27,7 @@ local function GetQuestTitle(questID)
 end
 
 function QPS:PrintQuestProgress(questID, fulfilled, required)
+    if not isNotificationEnabled("chatProgress") then return end
     local title = GetQuestTitle(questID)
     self:Print(L["Quest Progress Chat"]:format(
         title,
@@ -27,11 +37,13 @@ function QPS:PrintQuestProgress(questID, fulfilled, required)
 end
 
 function QPS:PrintQuestComplete(questID)
+    if not isNotificationEnabled("chatComplete") then return end
     local title = GetQuestTitle(questID)
     self:Print(L["Quest Complete Chat"]:format(title))
 end
 
 function QPS:PrintGroupQuestProgress(sender, questID, fulfilled, required)
+    if not isNotificationEnabled("chatGroupProgress") then return end
     local title = GetQuestTitle(questID)
     
     self:Print(L["Group Progress Chat"]:format(
@@ -43,6 +55,8 @@ function QPS:PrintGroupQuestProgress(sender, questID, fulfilled, required)
 end
 
 function QPS:PrintGroupQuestComplete(sender, questID, fulfilled, required)
+    if not isNotificationEnabled("chatGroupComplete") then return end
+
     local title = GetQuestTitle(questID)
     
     self:Print(L["Group Complete Chat"]:format(sender, title))

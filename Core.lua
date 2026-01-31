@@ -15,17 +15,20 @@ QPS.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
 -- Default Settings (AceDB profile structure)
 QPS.defaults = {
     profile = {
-        enableSelfProgressSound = true,
-        enableSelfCompleteSound = true,
-        enableGroupProgressSound = true,
-        enableGroupCompleteSound = true,
+        onlyInGroup = true,
 
         sounds = {
             selfProgress  = "QPS: More Work",
             selfComplete  = "QPS: Job's Done",
             groupProgress = "QPS: More Work",
             groupComplete = "QPS: Job's Done",
-        }
+        },
+        notifications = {
+            chatProgress       = true,
+            chatComplete       = true,
+            chatGroupProgress  = true,
+            chatGroupComplete  = true,
+        },
     }
 }
 
@@ -33,6 +36,10 @@ QPS.defaults = {
 QPS.frame = CreateFrame("Frame")
 QPS.frame:RegisterEvent("ADDON_LOADED")
 QPS.frame:RegisterEvent("PLAYER_LOGIN")
+
+-- Throttling für Sound-Wiedergabe (2 Sekunden pro Ereignistyp)
+QPS.lastSoundTime = {} -- Tabelle für Zeitstempel pro kind
+QPS.soundThrottle = 2
 
 QPS.frame:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
@@ -45,24 +52,11 @@ QPS.frame:SetScript("OnEvent", function(self, event, ...)
     end
 end)
 
-function QPS:InitializeSavedVariables()
-    if not AceDB then
-        self:Print("ERROR: AceDB-3.0 not loaded!")
-        return
-    end
-    
-    -- Initialize AceDB with profile support
-    self.db = AceDB:New("QuestProgressSoundDB", self.defaults, true)
-    
-    -- Migrate old character-specific settings if they exist
-    if self.db.profile.sounds then
-        self:MigrateSoundConfig()
-    end
-    
-    self:RegisterDefaultSounds()
-end
+-- -------------------------------------------------------
+-- Helper Functions (must be defined before use)
+-- -------------------------------------------------------
 
-function QPS:MigrateSoundConfig()
+local function MigrateSoundConfig(self)
     local s = self.db.profile.sounds
 
     local function ensure(field, defaultKey)
@@ -78,9 +72,31 @@ function QPS:MigrateSoundConfig()
     ensure("selfComplete",  "QPS: Job's Done")
     ensure("groupProgress", "QPS: More Work")
     ensure("groupComplete", "QPS: Job's Done")
+    
+    -- Migration für notifications
+    if not self.db.profile.notifications then
+        self.db.profile.notifications = {}
+    end
+    
+    local n = self.db.profile.notifications
+    local function ensureNotification(field, defaultValue)
+        if n[field] == nil then
+            n[field] = defaultValue
+        end
+    end
+    
+    ensureNotification("chatProgress", true)
+    ensureNotification("chatComplete", true)
+    ensureNotification("chatGroupProgress", true)
+    ensureNotification("chatGroupComplete", true)
+    
+    -- Migration für onlyInGroup
+    if self.db.profile.onlyInGroup == nil then
+        self.db.profile.onlyInGroup = true
+    end
 end
 
-function QPS:RegisterDefaultSounds()
+local function RegisterDefaultSounds(self)
     if not self.LSM then return end
 
     local basePath = "Interface\\AddOns\\QuestProgressSound\\media\\"
@@ -88,6 +104,27 @@ function QPS:RegisterDefaultSounds()
     -- Pfad-basiert: LibSharedMedia liefert später eine Datei-URL zurück
     self.LSM:Register("sound", "QPS: More Work", basePath .. "schaffe.ogg")
     self.LSM:Register("sound", "QPS: Job's Done", basePath .. "feierabend.ogg")
+end
+
+-- -------------------------------------------------------
+-- Initialization Functions
+-- -------------------------------------------------------
+
+function QPS:InitializeSavedVariables()
+    if not AceDB then
+        self:Print("ERROR: AceDB-3.0 not loaded!")
+        return
+    end
+    
+    -- Initialize AceDB with profile support
+    self.db = AceDB:New("QuestProgressSoundDB", self.defaults, true)
+    
+    -- Migrate old character-specific settings if they exist
+    if self.db.profile.sounds then
+        MigrateSoundConfig(self)
+    end
+    
+    RegisterDefaultSounds(self)
 end
 
 
@@ -101,7 +138,7 @@ function QPS:OnPlayerLogin()
         end
     end
     
-    self:RegisterDefaultSounds()
+    RegisterDefaultSounds(self)
     self:InitComm()
     self:CreateOptionsPanel()
 end
@@ -110,8 +147,15 @@ end
 function QPS:PlayConfiguredSound(kind)
     if not self.db or not self.db.profile or not self.db.profile.sounds then return end
 
+    -- Throttling: Prüfe, ob seit dem letzten Sound dieses Typs genug Zeit vergangen ist
+    local currentTime = GetTime()
+    local lastTime = self.lastSoundTime[kind] or 0
+    if (currentTime - lastTime) < self.soundThrottle then
+        return -- Sound-Wiedergabe überspringen
+    end
+
     local value = self.db.profile.sounds[kind]
-    if not value then return end
+    if not value or value == "" or value == "None" then return end
 
     -- LSM-Sound per Name
     if self.LSM and type(value) == "string" then
@@ -124,6 +168,8 @@ function QPS:PlayConfiguredSound(kind)
                 -- Dateipfad
                 PlaySoundFile(media, "Master")
             end
+            -- Zeitstempel aktualisieren nach erfolgreicher Wiedergabe
+            self.lastSoundTime[kind] = currentTime
             return
         end
     end
@@ -131,6 +177,8 @@ function QPS:PlayConfiguredSound(kind)
     -- Fallback: falls noch eine alte numerische ID im Profil stehen sollte
     if type(value) == "number" then
         PlaySound(value, "Master")
+        -- Zeitstempel aktualisieren nach erfolgreicher Wiedergabe
+        self.lastSoundTime[kind] = currentTime
     end
 end
 
