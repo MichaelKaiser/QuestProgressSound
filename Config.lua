@@ -55,9 +55,12 @@ local function CreateSoundDropDown(parent, label, x, y, getFunc, setFunc)
     local dd = CreateFrame("Frame", nil, parent, "UIDropDownMenuTemplate")
     dd:SetPoint("TOPLEFT", parent, "TOPLEFT", x, y)
 
-    local text = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    text:SetPoint("BOTTOMLEFT", dd, "TOPLEFT", 16, 3)
-    text:SetText(label)
+    -- Nur Label anzeigen wenn vorhanden
+    if label then
+        local text = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        text:SetPoint("BOTTOMLEFT", dd, "TOPLEFT", 16, 3)
+        text:SetText(label)
+    end
 
     local function Initialize(self, level)
         local sounds = GetSortedSoundList()
@@ -82,13 +85,13 @@ local function CreateSoundDropDown(parent, label, x, y, getFunc, setFunc)
         local current = getFunc()
         UIDropDownMenu_Initialize(dd, Initialize)
         UIDropDownMenu_SetWidth(dd, 220)
-        UIDropDownMenu_SetSelectedValue(dd, current or "")
+        UIDropDownMenu_SetSelectedValue(dd, current or "None")
 
         -- Den aktuell selektierten Namen als Text anzeigen
         if current and current ~= "" then
             UIDropDownMenu_SetText(dd, current)
         else
-            UIDropDownMenu_SetText(dd, L["Please select sound"])
+            UIDropDownMenu_SetText(dd, "None")
         end
     end
 
@@ -136,63 +139,59 @@ function QPS:CreateOptionsPanel()
     selfSeparator:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset)
     selfSeparator:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -16, yOffset)
     selfSeparator:SetColorTexture(0.3, 0.3, 0.3, 0.8)
-    yOffset = yOffset - 15
+    yOffset = yOffset - 20
     
-    -- Eigener Fortschritt
+    -- Eigener Fortschritt - Horizontal Layout
     local selfProgressLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    selfProgressLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
+    selfProgressLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset - 2)
     selfProgressLabel:SetText(L["Quest Progress"])
     selfProgressLabel:SetTextColor(1, 0.82, 0)
-    yOffset = yOffset - 25
     
-    self.ui.selfProgressCheck = CreateCheckButton(
-        panel,
-        L["Sound Play"],
-        L["Quest Progress Enable"],
-        36,
-        yOffset,
-        function() return QPS.db.profile.enableSelfProgressSound end,
-        function(value) QPS.db.profile.enableSelfProgressSound = value end
-    )
-    yOffset = yOffset - 30
-
     self.ui.selfProgressDrop = CreateSoundDropDown(
         panel,
-        L["Sound Select"],
-        46,
+        nil,  -- Kein Label, da bereits links
+        160,
         yOffset,
         function() return QPS.db.profile.sounds.selfProgress end,
         function(value) QPS.db.profile.sounds.selfProgress = value end
     )
-    yOffset = yOffset - 55
     
-    -- Eigener Abschluss
+    self.ui.chatProgressCheck = CreateCheckButton(
+        panel,
+        L["Chat Notification"] or "Chat-Benachrichtigung",
+        L["Chat Notification Progress Tooltip"] or "Quest-Fortschritt im Chat anzeigen",
+        430,
+        yOffset - 2,
+        function() return QPS.db.profile.notifications.chatProgress end,
+        function(value) QPS.db.profile.notifications.chatProgress = value end
+    )
+    yOffset = yOffset - 50
+    
+    -- Eigener Abschluss - Horizontal Layout
     local selfCompleteLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    selfCompleteLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
+    selfCompleteLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset - 2)
     selfCompleteLabel:SetText(L["Quest Completion"])
     selfCompleteLabel:SetTextColor(1, 0.82, 0)
-    yOffset = yOffset - 25
     
-    self.ui.selfCompleteCheck = CreateCheckButton(
-        panel,
-        L["Sound Play"],
-        L["Quest Completion Enable"],
-        36,
-        yOffset,
-        function() return QPS.db.profile.enableSelfCompleteSound end,
-        function(value) QPS.db.profile.enableSelfCompleteSound = value end
-    )
-    yOffset = yOffset - 30
-
     self.ui.selfCompleteDrop = CreateSoundDropDown(
         panel,
-        L["Sound Select"],
-        46,
+        nil,  -- Kein Label, da bereits links
+        160,
         yOffset,
         function() return QPS.db.profile.sounds.selfComplete end,
         function(value) QPS.db.profile.sounds.selfComplete = value end
     )
-    yOffset = yOffset - 75
+    
+    self.ui.chatCompleteCheck = CreateCheckButton(
+        panel,
+        L["Chat Notification"] or "Chat-Benachrichtigung",
+        L["Chat Notification Complete Tooltip"] or "Quest-Abschluss im Chat anzeigen",
+        430,
+        yOffset - 2,
+        function() return QPS.db.profile.notifications.chatComplete end,
+        function(value) QPS.db.profile.notifications.chatComplete = value end
+    )
+    yOffset = yOffset - 60
     
     -- ==============================================
     -- BEREICH: GRUPPENQUESTS
@@ -210,69 +209,79 @@ function QPS:CreateOptionsPanel()
     groupSeparator:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset)
     groupSeparator:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -16, yOffset)
     groupSeparator:SetColorTexture(0.3, 0.3, 0.3, 0.8)
-    yOffset = yOffset - 15
+    yOffset = yOffset - 20
     
-    -- Gruppenfortschritt
+    -- Nur in Gruppe - erste Zeile
+    self.ui.onlyInGroupCheck = CreateCheckButton(
+        panel,
+        L["Only In Group"] or "Nur in Gruppe",
+        L["Only In Group Tooltip"] or "Sendet Nachrichten nur in Gruppen, nicht in Raids",
+        26,
+        yOffset,
+        function() return QPS.db.profile.onlyInGroup end,
+        function(value) QPS.db.profile.onlyInGroup = value end
+    )
+    yOffset = yOffset - 40
+    
+    -- Gruppenfortschritt - Horizontal Layout
     local groupProgressLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    groupProgressLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
+    groupProgressLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset - 2)
     groupProgressLabel:SetText(L["Quest Progress"])
     groupProgressLabel:SetTextColor(1, 0.82, 0)
-    yOffset = yOffset - 25
     
-    self.ui.groupProgressCheck = CreateCheckButton(
-        panel,
-        L["Sound Play"],
-        L["Group Progress Enable"],
-        36,
-        yOffset,
-        function() return QPS.db.profile.enableGroupProgressSound end,
-        function(value) QPS.db.profile.enableGroupProgressSound = value end
-    )
-    yOffset = yOffset - 30
-
     self.ui.groupProgressDrop = CreateSoundDropDown(
         panel,
-        L["Sound Select"],
-        46,
+        nil,  -- Kein Label, da bereits links
+        160,
         yOffset,
         function() return QPS.db.profile.sounds.groupProgress end,
         function(value) QPS.db.profile.sounds.groupProgress = value end
     )
-    yOffset = yOffset - 55
     
-    -- Gruppenabschluss
+    self.ui.chatGroupProgressCheck = CreateCheckButton(
+        panel,
+        L["Chat Notification"] or "Chat-Benachrichtigung",
+        L["Chat Notification Group Progress Tooltip"] or "Gruppen-Fortschritt im Chat anzeigen",
+        430,
+        yOffset - 2,
+        function() return QPS.db.profile.notifications.chatGroupProgress end,
+        function(value) QPS.db.profile.notifications.chatGroupProgress = value end
+    )
+    yOffset = yOffset - 50
+    
+    -- Gruppenabschluss - Horizontal Layout
     local groupCompleteLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    groupCompleteLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset)
+    groupCompleteLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", 26, yOffset - 2)
     groupCompleteLabel:SetText(L["Quest Completion"])
     groupCompleteLabel:SetTextColor(1, 0.82, 0)
-    yOffset = yOffset - 25
     
-    self.ui.groupCompleteCheck = CreateCheckButton(
-        panel,
-        L["Sound Play"],
-        L["Group Completion Enable"],
-        36,
-        yOffset,
-        function() return QPS.db.profile.enableGroupCompleteSound end,
-        function(value) QPS.db.profile.enableGroupCompleteSound = value end
-    )
-    yOffset = yOffset - 30
-
     self.ui.groupCompleteDrop = CreateSoundDropDown(
         panel,
-        L["Sound Select"],
-        46,
+        nil,  -- Kein Label, da bereits links
+        160,
         yOffset,
         function() return QPS.db.profile.sounds.groupComplete end,
         function(value) QPS.db.profile.sounds.groupComplete = value end
     )
+    
+    self.ui.chatGroupCompleteCheck = CreateCheckButton(
+        panel,
+        L["Chat Notification"] or "Chat-Benachrichtigung",
+        L["Chat Notification Group Complete Tooltip"] or "Gruppen-Abschluss im Chat anzeigen",
+        430,
+        yOffset - 2,
+        function() return QPS.db.profile.notifications.chatGroupComplete end,
+        function(value) QPS.db.profile.notifications.chatGroupComplete = value end
+    )
 
     panel.refresh = function()
         if not QPS.db then return end
-        if QPS.ui.selfProgressCheck then QPS.ui.selfProgressCheck:SetFromDB() end
-        if QPS.ui.selfCompleteCheck then QPS.ui.selfCompleteCheck:SetFromDB() end
-        if QPS.ui.groupProgressCheck then QPS.ui.groupProgressCheck:SetFromDB() end
-        if QPS.ui.groupCompleteCheck then QPS.ui.groupCompleteCheck:SetFromDB() end
+        
+        if QPS.ui.chatProgressCheck then QPS.ui.chatProgressCheck:SetFromDB() end
+        if QPS.ui.chatCompleteCheck then QPS.ui.chatCompleteCheck:SetFromDB() end
+        if QPS.ui.chatGroupProgressCheck then QPS.ui.chatGroupProgressCheck:SetFromDB() end
+        if QPS.ui.chatGroupCompleteCheck then QPS.ui.chatGroupCompleteCheck:SetFromDB() end
+        if QPS.ui.onlyInGroupCheck then QPS.ui.onlyInGroupCheck:SetFromDB() end
 
         if QPS.ui.selfProgressDrop then QPS.ui.selfProgressDrop:RefreshFromDB() end
         if QPS.ui.selfCompleteDrop then QPS.ui.selfCompleteDrop:RefreshFromDB() end

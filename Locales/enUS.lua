@@ -14,6 +14,7 @@ L["Config Subtitle"] = "Configure sounds for quest progress and completion."
 L["Sound Play"] = "Play sound"
 L["Sound Select"] = "Select sound"
 L["Please select sound"] = "Please select sound"
+L["None"] = "None"
 
 -- Own Quests Section
 L["Own Quests"] = "Own Quests"
@@ -22,10 +23,20 @@ L["Quest Progress Enable"] = "Enable/Disable sound when you make progress in a q
 L["Quest Completion"] = "Quest Completion:"
 L["Quest Completion Enable"] = "Enable/Disable sound when you complete all objectives of a quest."
 
+-- Chat Notifications
+L["Chat Notification"] = "Chat notification"
+L["Chat Notification Progress Tooltip"] = "Show quest progress in chat"
+L["Chat Notification Complete Tooltip"] = "Show quest completion in chat"
+L["Chat Notification Group Progress Tooltip"] = "Show group progress in chat"
+L["Chat Notification Group Complete Tooltip"] = "Show group completion in chat"
+
 -- Group Quests Section
 L["Group Quests"] = "Group Quests"
 L["Group Progress Enable"] = "Enable/Disable sound when a group member reports quest progress."
 L["Group Completion Enable"] = "Enable/Disable sound when a group member completes a quest."
+L["Communication Settings"] = "Communication Settings:"
+L["Only In Group"] = "Only in group"
+L["Only In Group Tooltip"] = "Send messages only in groups, not in raids"
 
 -- Profile Management
 L["Profile Management"] = "Profile Management"

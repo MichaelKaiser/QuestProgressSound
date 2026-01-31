@@ -15,17 +15,20 @@ QPS.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
 -- Default Settings (AceDB profile structure)
 QPS.defaults = {
     profile = {
-        enableSelfProgressSound = true,
-        enableSelfCompleteSound = true,
-        enableGroupProgressSound = true,
-        enableGroupCompleteSound = true,
+        onlyInGroup = true,
 
         sounds = {
             selfProgress  = "QPS: More Work",
             selfComplete  = "QPS: Job's Done",
             groupProgress = "QPS: More Work",
             groupComplete = "QPS: Job's Done",
-        }
+        },
+        notifications = {
+            chatProgress       = true,
+            chatComplete       = true,
+            chatGroupProgress  = true,
+            chatGroupComplete  = true,
+        },
     }
 }
 
@@ -78,6 +81,28 @@ function QPS:MigrateSoundConfig()
     ensure("selfComplete",  "QPS: Job's Done")
     ensure("groupProgress", "QPS: More Work")
     ensure("groupComplete", "QPS: Job's Done")
+    
+    -- Migration für notifications
+    if not self.db.profile.notifications then
+        self.db.profile.notifications = {}
+    end
+    
+    local n = self.db.profile.notifications
+    local function ensureNotification(field, defaultValue)
+        if n[field] == nil then
+            n[field] = defaultValue
+        end
+    end
+    
+    ensureNotification("chatProgress", true)
+    ensureNotification("chatComplete", true)
+    ensureNotification("chatGroupProgress", true)
+    ensureNotification("chatGroupComplete", true)
+    
+    -- Migration für onlyInGroup
+    if self.db.profile.onlyInGroup == nil then
+        self.db.profile.onlyInGroup = true
+    end
 end
 
 function QPS:RegisterDefaultSounds()
@@ -111,7 +136,7 @@ function QPS:PlayConfiguredSound(kind)
     if not self.db or not self.db.profile or not self.db.profile.sounds then return end
 
     local value = self.db.profile.sounds[kind]
-    if not value then return end
+    if not value or value == "" or value == "None" then return end
 
     -- LSM-Sound per Name
     if self.LSM and type(value) == "string" then

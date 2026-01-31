@@ -18,6 +18,11 @@ end
 
 function QPS:SendProgress(questID, fulfilled, required)
     if not IsInGroup() then return end
+    
+    -- Nur in Gruppe senden, wenn die Option aktiviert ist
+    if self.db and self.db.profile.onlyInGroup then
+        if IsInRaid() then return end
+    end
 
     local msg = string.format(
         "PROGRESS;%d;%d;%d",
@@ -31,6 +36,11 @@ end
 
 function QPS:SendComplete(questID, fulfilled, required)
     if not IsInGroup() then return end
+    
+    -- Nur in Gruppe senden, wenn die Option aktiviert ist
+    if self.db and self.db.profile.onlyInGroup then
+        if IsInRaid() then return end
+    end
 
     local msg = string.format(
         "COMPLETE;%d;%d;%d",
@@ -92,18 +102,14 @@ end
 
 function QPS:OnGroupQuestProgress(sender, questID, fulfilled, required)
     -- Sound für Gruppenfortschritt
-    if self.db.profile.enableGroupProgressSound then
-        self:PlayConfiguredSound("groupProgress")
-    end
+    self:PlayConfiguredSound("groupProgress")
 
-    -- Chat-Ausgabe – aktuell immer an, später per Config schaltbar
+    -- Chat-Ausgabe
     self:PrintGroupQuestProgress(sender, questID, fulfilled, required)
 end
 
 function QPS:OnGroupQuestComplete(sender, questID, fulfilled, required)
-    if self.db.profile.enableGroupCompleteSound then
-        self:PlayConfiguredSound("groupComplete")
-    end
+    self:PlayConfiguredSound("groupComplete")
 
     self:PrintGroupQuestComplete(sender, questID, fulfilled, required)
 end
