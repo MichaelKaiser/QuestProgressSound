@@ -8,10 +8,11 @@
 ## X-Curse-Project-ID: 1449229
 
 Libs\LibStub\LibStub.lua
+Libs\LibSharedMedia-3.0\CallbackHandler-1.0\CallbackHandler-1.0.lua
 Libs\AceDB-3.0\AceDB-3.0.lua
 Libs\AceDBOptions-3.0\AceDBOptions-3.0.lua
 Libs\AceLocale-3.0\AceLocale-3.0.lua
-Libs\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
+Libs\LibSharedMedia-3.0\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
 
 Locales\enUS.lua
 Locales\deDE.lua

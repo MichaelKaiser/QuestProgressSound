@@ -4,7 +4,17 @@ local ADDON_NAME, QPS = ...
 
 local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
 local AceDB = LibStub and LibStub("AceDB-3.0", true)
-local L = LibStub and LibStub("AceLocale-3.0"):GetLocale("QuestProgressSound")
+local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
+local L = AceLocale and AceLocale:GetLocale("QuestProgressSound", true) or {}
+
+-- Fallback metatable for missing translations
+if not getmetatable(L) then
+    setmetatable(L, {
+        __index = function(t, k)
+            return k
+        end
+    })
+end
 
 QPS.LSM = LSM
 QPS.L = L
@@ -129,7 +139,11 @@ end
 
 
 function QPS:OnPlayerLogin()
-    self:Print(L["Loaded successfully"]:format(tostring(self.version)))
+    local msg = L and L["Loaded successfully"] or "Loaded successfully (v%s)"
+    if msg and type(msg) == "string" then
+        self:Print(msg:format(tostring(self.version)))
+    end
+    
     if not self.LSM and C_AddOns and C_AddOns.LoadAddOn then
         local loaded = C_AddOns.LoadAddOn("LibSharedMedia-3.0")
         if loaded and LibStub then
