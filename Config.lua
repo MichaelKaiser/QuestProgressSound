@@ -1,7 +1,17 @@
 -- QuestProgressSound/Config.lua
 
 local _, QPS = ...
-local L = LibStub("AceLocale-3.0"):GetLocale("QuestProgressSound")
+local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
+local L = AceLocale and AceLocale:GetLocale("QuestProgressSound", true) or QPS.L or {}
+
+-- Fallback metatable for missing translations
+if not getmetatable(L) then
+    setmetatable(L, {
+        __index = function(t, k)
+            return k
+        end
+    })
+end
 
 local AceDBOptions = LibStub and LibStub("AceDBOptions-3.0", true)
 
