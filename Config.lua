@@ -2,13 +2,16 @@
 
 local _, QPS = ...
 local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
-local L = AceLocale and AceLocale:GetLocale("QuestProgressSound", true) or QPS.L or {}
+local L = (AceLocale and AceLocale:GetLocale("QuestProgressSound", true)) or QPS.L or {}
 
--- Fallback metatable for missing translations
+if type(L) ~= "table" then
+    L = {}
+end
+
 if not getmetatable(L) then
     setmetatable(L, {
-        __index = function(t, k)
-            return k
+        __index = function(_, key)
+            return key
         end
     })
 end

@@ -5,16 +5,24 @@ local ADDON_NAME, QPS = ...
 local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
 local AceDB = LibStub and LibStub("AceDB-3.0", true)
 local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
-local L = AceLocale and AceLocale:GetLocale("QuestProgressSound", true) or {}
 
--- Fallback metatable for missing translations
-if not getmetatable(L) then
-    setmetatable(L, {
-        __index = function(t, k)
-            return k
-        end
-    })
+local function EnsureLocaleTable(locale)
+    if type(locale) ~= "table" then
+        locale = {}
+    end
+
+    if not getmetatable(locale) then
+        setmetatable(locale, {
+            __index = function(_, key)
+                return key
+            end
+        })
+    end
+
+    return locale
 end
+
+local L = EnsureLocaleTable(AceLocale and AceLocale:GetLocale("QuestProgressSound", true) or {})
 
 QPS.LSM = LSM
 QPS.L = L

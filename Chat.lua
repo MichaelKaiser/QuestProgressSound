@@ -1,7 +1,19 @@
 -- QuestProgressSound/Chat.lua
 
 local _, QPS = ...
-local L = QPS.L
+local L = QPS.L or {}
+
+if type(L) ~= "table" then
+    L = {}
+end
+
+if not getmetatable(L) then
+    setmetatable(L, {
+        __index = function(_, key)
+            return key
+        end
+    })
+end
 
 local PREFIX = "|cff00ff00[QPS]|r "
 
