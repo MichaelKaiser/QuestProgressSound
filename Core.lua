@@ -114,6 +114,8 @@ local function RegisterDefaultSounds(self)
     -- Pfad-basiert: LibSharedMedia liefert später eine Datei-URL zurück
     self.LSM:Register("sound", "QPS: More Work", basePath .. "schaffe.ogg")
     self.LSM:Register("sound", "QPS: Job's Done", basePath .. "feierabend.ogg")
+    self.LSM:Register("sound", "QPS: Fertig, Meister", basePath .. "fertigmeister.ogg")
+    self.LSM:Register("sound", "QPS: Jup, hab ick", basePath .. "habich.ogg")
 end
 
 -- -------------------------------------------------------

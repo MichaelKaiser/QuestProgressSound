@@ -71,14 +71,18 @@ function QPS:CheckQuestProgress(questID)
 
     -- ✅ Completion hat Priorität
     if isNowComplete and not wasComplete then
-        self:PlayConfiguredSound("selfComplete")
+        if self.db.enableSelfCompleteSound then
+            self:PlayConfiguredSound("selfComplete")
+        end
 
         QPS:PrintQuestComplete(questID)
         QPS:SendComplete(questID, totalFulfilled, totalRequired)
 
     -- ✅ Fortschritt bei JEDEM Zähleranstieg
     elseif totalFulfilled > previousFulfilled then
-        self:PlayConfiguredSound("selfProgress")
+        if self.db.enableSelfProgressSound then
+            self:PlayConfiguredSound("selfProgress")
+        end
 
         QPS:PrintQuestProgress(questID, totalFulfilled, totalRequired)
         QPS:SendProgress(questID, totalFulfilled, totalRequired)
