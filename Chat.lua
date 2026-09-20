@@ -1,18 +1,54 @@
 -- QuestProgressSound/Chat.lua
 
 local _, QPS = ...
-local L = QPS.L or {}
 
-if type(L) ~= "table" then
-    L = {}
+local fallbackMessages = {
+    enUS = {
+        ["Quest Progress Chat"] = "Quest progress: %s (%d / %d)",
+        ["Quest Complete Chat"] = "Quest completed: %s",
+        ["Unknown Quest"] = "Unknown Quest",
+        ["Group Progress Chat"] = "%s: Quest progress: %s (%d / %d)",
+        ["Group Complete Chat"] = "%s: Quest completed: %s",
+    },
+    deDE = {
+        ["Quest Progress Chat"] = "Questfortschritt: %s (%d / %d)",
+        ["Quest Complete Chat"] = "Quest abgeschlossen: %s",
+        ["Unknown Quest"] = "Unbekannte Quest",
+        ["Group Progress Chat"] = "%s: Questfortschritt: %s (%d / %d)",
+        ["Group Complete Chat"] = "%s: Quest abgeschlossen: %s",
+    },
+}
+
+local function GetChatLocale()
+    local locale = QPS.L
+    if type(locale) == "table" and next(locale) ~= nil then
+        return locale
+    end
+
+    if LibStub then
+        local AceLocale = LibStub("AceLocale-3.0", true)
+        if AceLocale then
+            local freshLocale = AceLocale:GetLocale("QuestProgressSound", true)
+            if type(freshLocale) == "table" and next(freshLocale) ~= nil then
+                QPS.L = freshLocale
+                return freshLocale
+            end
+        end
+    end
+
+    return {}
 end
 
-if not getmetatable(L) then
-    setmetatable(L, {
-        __index = function(_, key)
-            return key
-        end
-    })
+local function GetMessage(key)
+    local locale = GetChatLocale()
+    local message = locale[key]
+    if type(message) == "string" then
+        return message
+    end
+
+    local fallbackLocale = GetLocale and GetLocale() or "enUS"
+    local fallback = fallbackMessages[fallbackLocale] or fallbackMessages.enUS
+    return fallback[key] or key
 end
 
 local PREFIX = "|cff00ff00[QPS]|r "
@@ -35,13 +71,13 @@ local function GetQuestTitle(questID)
     if not title and QuestUtils_GetQuestName then
         title = QuestUtils_GetQuestName(questID)
     end
-    return title or L["Unknown Quest"] .. " (ID: " .. questID .. ")"
+    return title or GetMessage("Unknown Quest") .. " (ID: " .. questID .. ")"
 end
 
 function QPS:PrintQuestProgress(questID, fulfilled, required)
     if not isNotificationEnabled("chatProgress") then return end
     local title = GetQuestTitle(questID)
-    self:Print(L["Quest Progress Chat"]:format(
+    self:Print(GetMessage("Quest Progress Chat"):format(
         title,
         fulfilled,
         required
@@ -51,14 +87,14 @@ end
 function QPS:PrintQuestComplete(questID)
     if not isNotificationEnabled("chatComplete") then return end
     local title = GetQuestTitle(questID)
-    self:Print(L["Quest Complete Chat"]:format(title))
+    self:Print(GetMessage("Quest Complete Chat"):format(title))
 end
 
 function QPS:PrintGroupQuestProgress(sender, questID, fulfilled, required)
     if not isNotificationEnabled("chatGroupProgress") then return end
     local title = GetQuestTitle(questID)
     
-    self:Print(L["Group Progress Chat"]:format(
+    self:Print(GetMessage("Group Progress Chat"):format(
         sender,
         title,
         fulfilled or 0,
@@ -71,5 +107,5 @@ function QPS:PrintGroupQuestComplete(sender, questID, fulfilled, required)
 
     local title = GetQuestTitle(questID)
     
-    self:Print(L["Group Complete Chat"]:format(sender, title))
+    self:Print(GetMessage("Group Complete Chat"):format(sender, title))
 end

@@ -6,26 +6,22 @@ local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
 local AceDB = LibStub and LibStub("AceDB-3.0", true)
 local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
 
-local function EnsureLocaleTable(locale)
-    if type(locale) ~= "table" then
-        locale = {}
-    end
-
-    if not getmetatable(locale) then
-        setmetatable(locale, {
-            __index = function(_, key)
-                return key
-            end
-        })
-    end
-
-    return locale
+local function SafeLocaleFallback()
+    return {}
 end
 
-local L = EnsureLocaleTable(AceLocale and AceLocale:GetLocale("QuestProgressSound", true) or {})
+local function GetCurrentLocale()
+    if AceLocale then
+        local locale = AceLocale:GetLocale("QuestProgressSound", true)
+        if type(locale) == "table" then
+            return locale
+        end
+    end
+    return SafeLocaleFallback()
+end
 
 QPS.LSM = LSM
-QPS.L = L
+QPS.L = GetCurrentLocale()
 
 QPS.name = ADDON_NAME
 QPS.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
@@ -149,7 +145,9 @@ end
 
 
 function QPS:OnPlayerLogin()
-    local msg = L and L["Loaded successfully"] or "Loaded successfully (v%s)"
+    self.L = GetCurrentLocale()
+
+    local msg = self.L and self.L["Loaded successfully"] or "Loaded successfully (v%s)"
     if msg and type(msg) == "string" then
         self:Print(msg:format(tostring(self.version)))
     end

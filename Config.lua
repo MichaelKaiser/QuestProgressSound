@@ -2,19 +2,23 @@
 
 local _, QPS = ...
 local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
-local L = (AceLocale and AceLocale:GetLocale("QuestProgressSound", true)) or QPS.L or {}
+local function GetConfigLocale()
+    local locale = QPS.L
+    if type(locale) == "table" and next(locale) ~= nil then
+        return locale
+    end
 
-if type(L) ~= "table" then
-    L = {}
-end
-
-if not getmetatable(L) then
-    setmetatable(L, {
-        __index = function(_, key)
-            return key
+    if AceLocale then
+        local freshLocale = AceLocale:GetLocale("QuestProgressSound", true)
+        if type(freshLocale) == "table" and next(freshLocale) ~= nil then
+            QPS.L = freshLocale
+            return freshLocale
         end
-    })
+    end
+    return {}
 end
+
+local L = GetConfigLocale()
 
 local AceDBOptions = LibStub and LibStub("AceDBOptions-3.0", true)
 
