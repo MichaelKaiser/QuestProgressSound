@@ -42,51 +42,64 @@ function QPS:CheckQuestProgress(questID)
     local objectives = C_QuestLog.GetQuestObjectives(questID)
     if not objectives then return end
 
-    local totalFulfilled = 0
-    local totalRequired = 0
-
-    for _, obj in ipairs(objectives) do
-        if obj.numFulfilled and obj.numRequired then
-            totalFulfilled = totalFulfilled + obj.numFulfilled
-            totalRequired  = totalRequired  + obj.numRequired
-        end
-    end
-
     local isNowComplete = C_QuestLog.IsComplete(questID)
-
     local cached = self.questCache[questID]
 
-    -- Initialisierung
+    -- Initialisierung: pro Questziel einzeln merken, kein Vergleich beim ersten Mal
     if not cached then
-        self.questCache[questID] = {
-            fulfilled = totalFulfilled,
-            required  = totalRequired,
-            isComplete = isNowComplete
-        }
+        cached = { objectives = {}, isComplete = isNowComplete }
+        for i, obj in ipairs(objectives) do
+            cached.objectives[i] = {
+                fulfilled = obj.numFulfilled or 0,
+                required  = obj.numRequired or 0,
+            }
+        end
+        self.questCache[questID] = cached
         return
     end
 
-    local previousFulfilled = cached.fulfilled
     local wasComplete = cached.isComplete
 
     -- ✅ Completion hat Priorität
     if isNowComplete and not wasComplete then
         self:PlayConfiguredSound("selfComplete")
 
+        local totalFulfilled, totalRequired = 0, 0
+        for _, obj in ipairs(objectives) do
+            if obj.numFulfilled and obj.numRequired then
+                totalFulfilled = totalFulfilled + obj.numFulfilled
+                totalRequired  = totalRequired  + obj.numRequired
+            end
+        end
+
         QPS:PrintQuestComplete(questID)
         QPS:SendComplete(questID, totalFulfilled, totalRequired)
 
-    -- ✅ Fortschritt bei JEDEM Zähleranstieg
-    elseif totalFulfilled > previousFulfilled then
-        self:PlayConfiguredSound("selfProgress")
+    else
+        -- ✅ Fortschritt wird pro Questziel einzeln erkannt und gemeldet
+        for i, obj in ipairs(objectives) do
+            if obj.numFulfilled and obj.numRequired then
+                local cachedObj = cached.objectives[i]
+                local previousFulfilled = cachedObj and cachedObj.fulfilled or 0
 
-        QPS:PrintQuestProgress(questID, totalFulfilled, totalRequired)
-        QPS:SendProgress(questID, totalFulfilled, totalRequired)
+                if obj.numFulfilled > previousFulfilled then
+                    self:PlayConfiguredSound("selfProgress")
+
+                    QPS:PrintQuestProgress(questID, obj.text, obj.numFulfilled, obj.numRequired)
+                    QPS:SendProgress(questID, obj.text, obj.numFulfilled, obj.numRequired)
+                end
+            end
+        end
     end
 
     -- Cache aktualisieren
-    cached.fulfilled = totalFulfilled
     cached.isComplete = isNowComplete
+    for i, obj in ipairs(objectives) do
+        cached.objectives[i] = {
+            fulfilled = obj.numFulfilled or 0,
+            required  = obj.numRequired or 0,
+        }
+    end
 end
 
 

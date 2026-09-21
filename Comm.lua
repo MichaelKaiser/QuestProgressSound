@@ -16,7 +16,7 @@ end
 -- Senden
 -- -------------------------------------------------------
 
-function QPS:SendProgress(questID, fulfilled, required)
+function QPS:SendProgress(questID, objectiveText, fulfilled, required)
     if not IsInGroup() then return end
     
     -- Nur in Gruppe senden, wenn die Option aktiviert ist
@@ -25,10 +25,11 @@ function QPS:SendProgress(questID, fulfilled, required)
     end
 
     local msg = string.format(
-        "PROGRESS;%d;%d;%d",
+        "PROGRESS;%d;%d;%d;%s",
         questID,
         fulfilled,
-        required
+        required,
+        objectiveText or ""
     )
 
     self:SendCommMessage(msg)
@@ -79,8 +80,8 @@ function QPS:HandleComm(prefix, msg, channel, sender)
         return
     end
 
-    local msgType, questID, fulfilled, required =
-        strsplit(";", msg)
+    local msgType, questID, fulfilled, required, objectiveText =
+        strsplit(";", msg, 5)
 
     questID   = tonumber(questID)
     fulfilled = tonumber(fulfilled)
@@ -89,7 +90,7 @@ function QPS:HandleComm(prefix, msg, channel, sender)
     if not questID then return end
 
     if msgType == "PROGRESS" then
-        QPS:OnGroupQuestProgress(shortSender, questID, fulfilled, required)
+        QPS:OnGroupQuestProgress(shortSender, questID, objectiveText, fulfilled, required)
 
     elseif msgType == "COMPLETE" then
         QPS:OnGroupQuestComplete(shortSender, questID, fulfilled, required)
@@ -100,12 +101,12 @@ end
 -- Group Quest Progress Handling
 -- -------------------------------------------------------
 
-function QPS:OnGroupQuestProgress(sender, questID, fulfilled, required)
+function QPS:OnGroupQuestProgress(sender, questID, objectiveText, fulfilled, required)
     -- Sound für Gruppenfortschritt
     self:PlayConfiguredSound("groupProgress")
 
     -- Chat-Ausgabe
-    self:PrintGroupQuestProgress(sender, questID, fulfilled, required)
+    self:PrintGroupQuestProgress(sender, questID, objectiveText, fulfilled, required)
 end
 
 function QPS:OnGroupQuestComplete(sender, questID, fulfilled, required)

@@ -53,8 +53,8 @@ L["Default"] = "Standard"
 L["No profiles available"] = "Keine Profile verfügbar"
 
 -- Chat Messages
-L["Quest Progress Chat"] = "Questfortschritt: %s (%d / %d)"
+L["Quest Progress Chat"] = "Questfortschritt %s: %s (%s / %s)"
 L["Quest Complete Chat"] = "Quest abgeschlossen: %s"
 L["Unknown Quest"] = "Unbekannte Quest"
-L["Group Progress Chat"] = "%s: Questfortschritt: %s (%d / %d)"
-L["Group Complete Chat"] = "%s: Quest abgeschlossen: %s"
+L["Group Progress Chat"] = "%s Questfortschritt %s: %s (%s / %s)"
+L["Group Complete Chat"] = "%s Quest abgeschlossen: %s"
