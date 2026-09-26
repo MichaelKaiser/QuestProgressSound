@@ -3,6 +3,8 @@
 local _, QPS = ...
 
 local commPrefix = "QPS"
+local localEchoes = {}
+local localEchoTimeout = 1
 
 -- -------------------------------------------------------
 -- Initialisierung
@@ -62,6 +64,7 @@ function QPS:SendCommMessage(msg)
         channel = "PARTY"
     end
 
+    localEchoes[msg] = GetTime()
     C_ChatInfo.SendAddonMessage(commPrefix, msg, channel)
 end
 
@@ -71,6 +74,14 @@ end
 
 function QPS:HandleComm(prefix, msg, channel, sender)
     if prefix ~= commPrefix then return end
+
+    local sentAt = localEchoes[msg]
+    if sentAt then
+        localEchoes[msg] = nil
+        if GetTime() - sentAt <= localEchoTimeout then
+            return
+        end
+    end
 
     local playerName = UnitName("player")
     local shortSender = Ambiguate(sender, "short")
